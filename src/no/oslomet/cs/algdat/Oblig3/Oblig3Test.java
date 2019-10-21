@@ -27,7 +27,7 @@ public class Oblig3Test {
     void oppgave1() {
         int antallFeil = 0;
         no.oslomet.cs.algdat.Oblig3.ObligSBinTre<Integer> tre =
-                new ObligSBinTre<>(Comparator.naturalOrder());
+                new no.oslomet.cs.algdat.Oblig3.ObligSBinTre<>(Comparator.naturalOrder());
 
         try {
             if (tre.antall() != 0) {
