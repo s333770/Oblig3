@@ -89,16 +89,138 @@ public class ObligSBinTre<T> implements Beholder<T>
   }
   
   @Override
-  public boolean fjern(T verdi)
+  public boolean fjern(T verdi)  // hører til klassen SBinTre
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+      if (verdi == null) return false;  // treet har ingen nullverdier
+
+      Node<T> p = rot, q = null;   // q skal være forelder til p
+
+      while (p != null)            // leter etter verdi
+      {
+          int cmp = comp.compare(verdi,p.verdi);      // sammenligner
+          if (cmp < 0) {
+              q = p; p = p.venstre;
+          }      // går til venstre
+          else if (cmp > 0) {
+              q = p; p = p.høyre;
+          }   // går til høyre
+          else break;    // den søkte verdien ligger i p
+      }
+      if (p == null) return false;   // finner ikke verdi
+
+      if (p.venstre == null || p.høyre == null)  // Tilfelle 1) og 2)
+      {
+          Node<T> b = p.venstre != null ? p.venstre : p.høyre;  // b for barn
+          if (p == rot) {
+              rot = b;
+          }
+          else if (p == q.venstre){
+              p.verdi=b.verdi;
+              q.venstre = p;
+              p.venstre=null;
+          }
+          else{
+              q.høyre = b;
+          }
+      }
+      else  // Tilfelle 3)
+      {
+          Node<T> s = p, r = p.høyre;   // finner neste i inorden
+          while (r.venstre != null)
+          {
+              s = r;    // s er forelder til r
+              r = r.venstre;
+          }
+
+          p.verdi = r.verdi;   // kopierer verdien i r til p
+
+          if (s != p) {
+              s.venstre = r.høyre;
+          }
+          else {
+              s.høyre = r.høyre;
+          }
+      }
+
+      antall--;   // det er nå én node mindre i treet
+      return true;
   }
-  
+
   public int fjernAlle(T verdi)
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+    if (verdi == null) throw new
+      IllegalArgumentException("verdi er null!");
+
+    Node<T> p = rot;   // hjelpepeker
+    Node<T> q = null;  // forelder til p
+    Node<T> r = null;  // neste i inorden mhp. verdi
+    Node<T> s = null;  // forelder til r
+
+    Stakk<Node<T>> stakk = new TabellStakk<>();
+
+    while (p != null)     // leter etter verdi
+    {
+      int cmp = comp.compare(verdi,p.verdi);  // sammenligner
+
+      if (cmp < 0) // skal til venstre
+      {
+        s = r;
+        r = q = p;
+        p = p.venstre;
+      }
+      else
+      {
+        if (cmp == 0)  // verdi ligger i p
+        {
+          stakk.leggInn(q);  // legger inn forelder til p
+          stakk.leggInn(p);  // legger inn p
+        }
+        // skal videre til høyre
+        q = p;
+        p = p.høyre;
+      }
+    }
+
+    // det er lagt inn to noder for hvert treff
+    int verdiAntall = stakk.antall()/2;
+
+    if (verdiAntall == 0) return 0;
+
+    while (stakk.antall() > 2)
+    {
+      p = stakk.taUt();  // p har ikke venstre barn
+      q = stakk.taUt();  // forelder til p
+
+      if (p == q.venstre) q.venstre = p.høyre;
+      else q.høyre = p.høyre;
+    }
+
+    // Har nå fjernet alle duplikatene,
+    // men har igjen første forekomst
+
+    p = stakk.taUt();  // p inneholder verdi
+    q = stakk.taUt();  // forelder til p
+
+    // Tilfelle 1) og 2), dvs. p har ikke to barn
+    if (p.venstre == null || p.høyre == null)
+    {
+      Node<T> x = p.høyre == null ? p.venstre : p.høyre;
+      if (p == rot) rot = x;
+      else if (p == q.venstre) q.venstre = x;
+      else q.høyre = x;
+    }
+    else  // p har to barn
+    {
+      p.verdi = r.verdi;   // kopierer fra den neste i inorden
+      if (r == p.høyre) p.høyre = r.høyre;
+      else s.venstre = r.høyre;
+    }
+
+    antall -= verdiAntall;
+
+    return verdiAntall;
   }
-  
+
   @Override
   public int antall()
   {
@@ -177,72 +299,46 @@ public class ObligSBinTre<T> implements Beholder<T>
 
   public String toString()
   {
-    StringBuilder s = new StringBuilder();
+      Node<T> p =førsteInorden(rot);
+      StringBuilder s = new StringBuilder();
     s.append('[');
-    if (!tom()) toString(rot, s);
+    while(p!=null){
+        s.append(p.verdi);
+        s.append(" ");
+            p=nesteInorden(p);
+        }
     s.append(']');
     return s.toString();
   }
-/*
-  public String omvendtString()
-  {
-    String ut="";
+
+public String omvendtString()  // iterativ inorden
+{
     Stakk<Node<T>> stakk = new TabellStakk<>();
-    Node<T> p = rot;   // starter i roten og går til høyre
-    for ( ; p.høyre != null; p = p.høyre) {
-      stakk.leggInn(p);
-    }
+    Node<T> p = rot;   // starter i roten og går til venstre
+    StringBuilder s = new StringBuilder();
+
+    for ( ; p.høyre != null; p = p.høyre) stakk.leggInn(p);
+
     while (true)
     {
-      if (p.venstre != null)          // til høyre i venstre subtre
-      {
-        for (p = p.venstre; p.høyre != null; p = p.høyre)
+        s.append('[');
+        s.append(p.verdi);
+        s.append("] ,");
+        if (p.venstre != null)          // til venstre i høyre subtre
         {
-          stakk.leggInn(p);
+            for (p = p.venstre; p.høyre != null; p = p.høyre)
+            {
+                stakk.leggInn(p);
+            }
         }
-      }
-      else if (!stakk.tom())
-      {
+        else if (!stakk.tom())
+        {
+            p = stakk.taUt();   // p.høyre == null, henter fra stakken
+        }
+        else break;          // stakken er tom - vi er ferdig
 
-        p = stakk.taUt();   // p.høyre == null, henter fra stakken
-        ut+=p.verdi;
-      }
-      else break;          // stakken er tom - vi er ferdig
     } // while
-    return ut;
-  }
-  */
-public String omvendtString()
-{
-  if (tom()) return "[]";
-  StringBuilder s = new StringBuilder();   // StringBuilder
-  s.append('[');                           // starter med [
-
-  Node<T> p = rot;
-  while (p.høyre != null) p = p.høyre;
-  s.append(p.verdi);
-
-  while (true)
-  {
-    if (p.venstre != null)
-    {
-      p = p.venstre;
-      while (p.høyre != null) p = p.høyre;
-    }
-    else
-    {
-      while (p.forelder != null && p.forelder.venstre == p)
-      {
-        p = p.forelder;
-      }
-      p = p.forelder;
-    }
-    if (p == null) break;
-    s.append(',').append(' ').append(p.verdi);
-  }
-  s.append(']');
-
-  return s.toString();
+    return s.toString();
 }
   
   public String høyreGren()
@@ -309,42 +405,12 @@ public String omvendtString()
 
   public static void main(String[] args) {
 
-    /*
-    ObligSBinTre<String> tre = new ObligSBinTre<>(Comparator.naturalOrder());
-    System. out .println(tre.antall()); // Utskrift: 0
-    ObligSBinTre<Character>tretre=new ObligSBinTre<>(Comparator.naturalOrder());
-    System.out.println(tretre.antall);
-    System.out.println("");
-    Integer[] a = {4,7,2,9,5,10,8,1,3,6};
-    ObligSBinTre<Integer> tretretre = new ObligSBinTre<>(Comparator. naturalOrder ());
-    for ( int verdi : a) tretretre.leggInn(verdi);
-    System. out .println(tretretre.antall()); // Utskrift: 10
-    System.out.println();
-*/
-    Integer[] ab = {4,7,2,9,4,10,8,7,4,6};
-    ObligSBinTre<Integer> tretretretre = new ObligSBinTre<>(Comparator. naturalOrder ());
-    for ( int verdi : ab) tretretretre.leggInn(verdi);
-    System. out .println(tretretretre.antall()); // Utskrift: 10
-    System. out .println(tretretretre.antall(5)); // Utskrift: 0
-    System. out .println(tretretretre.antall(4)); // Utskrift: 3
-    System. out .println(tretretretre.antall(7)); // Utskrift: 2
-    System. out .println(tretretretre.antall(10)); // Utskrift: 1
-    System.out.println("");
-    int [] a = {4,7,2,9,4,10,8,7,4,6,1};
-    ObligSBinTre<Integer> trefire = new ObligSBinTre<>(Comparator. naturalOrder ());
-    for ( int verdi : a) trefire.leggInn(verdi);
-    System. out .println(trefire);
-    System.out.println("");
-    int [] aaaa = {4,7,2,9,4,10,8,7,4,6,1};
-    ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
-    for ( int verdi : aaaa) tre.leggInn(verdi);
-   // System. out .println(tre.omvendtString()); // [10, 9, 8, 7, 7, 6, 4, 4, 4, 2, 1]
-  tre.omvendtString();
-    System.out.println();
-    int [] aa = {4,7,2,9,4,10,8,7,4,6,1};
-    ObligSBinTre<Integer> tretretretretre = new ObligSBinTre<>(Comparator. naturalOrder ());
-    for ( int verdi : aa) tretretretretre.leggInn(verdi);
-    System.out.println(tretretretretre.omvendtString());
+      int [] a = {4,7,2,9,4,10,8,7,4,6,1};
+      ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
+      for ( int verdi : a) tre.leggInn(verdi);
+      tre.fjernAlle(4);
+      System. out .println(tre.toString()); // 5
+     // System. out .println(tre + " " + tre.omvendtString());
 
 
 
