@@ -173,6 +173,8 @@ public class ObligSBinTre<T> implements Beholder<T>
     }
   }
 
+
+
   public String toString()
   {
     StringBuilder s = new StringBuilder();
@@ -181,13 +183,15 @@ public class ObligSBinTre<T> implements Beholder<T>
     s.append(']');
     return s.toString();
   }
-
+/*
   public String omvendtString()
   {
     String ut="";
     Stakk<Node<T>> stakk = new TabellStakk<>();
     Node<T> p = rot;   // starter i roten og går til høyre
-    for ( ; p.høyre != null; p = p.høyre) stakk.leggInn(p);
+    for ( ; p.høyre != null; p = p.høyre) {
+      stakk.leggInn(p);
+    }
     while (true)
     {
       if (p.venstre != null)          // til høyre i venstre subtre
@@ -207,6 +211,39 @@ public class ObligSBinTre<T> implements Beholder<T>
     } // while
     return ut;
   }
+  */
+public String omvendtString()
+{
+  if (tom()) return "[]";
+  StringBuilder s = new StringBuilder();   // StringBuilder
+  s.append('[');                           // starter med [
+
+  Node<T> p = rot;
+  while (p.høyre != null) p = p.høyre;
+  s.append(p.verdi);
+
+  while (true)
+  {
+    if (p.venstre != null)
+    {
+      p = p.venstre;
+      while (p.høyre != null) p = p.høyre;
+    }
+    else
+    {
+      while (p.forelder != null && p.forelder.venstre == p)
+      {
+        p = p.forelder;
+      }
+      p = p.forelder;
+    }
+    if (p == null) break;
+    s.append(',').append(' ').append(p.verdi);
+  }
+  s.append(']');
+
+  return s.toString();
+}
   
   public String høyreGren()
   {
@@ -303,6 +340,13 @@ public class ObligSBinTre<T> implements Beholder<T>
     for ( int verdi : aaaa) tre.leggInn(verdi);
    // System. out .println(tre.omvendtString()); // [10, 9, 8, 7, 7, 6, 4, 4, 4, 2, 1]
   tre.omvendtString();
+    System.out.println();
+    int [] aa = {4,7,2,9,4,10,8,7,4,6,1};
+    ObligSBinTre<Integer> tretretretretre = new ObligSBinTre<>(Comparator. naturalOrder ());
+    for ( int verdi : aa) tretretretretre.leggInn(verdi);
+    System.out.println(tretretretretre.omvendtString());
+
+
 
 
   }
