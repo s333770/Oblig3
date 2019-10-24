@@ -2,6 +2,8 @@ package no.oslomet.cs.algdat.Oblig3;
 
 ////////////////// ObligSBinTre /////////////////////////////////
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import javax.swing.tree.TreeNode;
 import java.util.*;
 
@@ -315,6 +317,7 @@ public String omvendtString()  // iterativ inorden
 {
     Stakk<Node<T>> stakk = new TabellStakk<>();
     Node<T> p = rot;   // starter i roten og går til venstre
+
     StringBuilder s = new StringBuilder();
 
     for ( ; p.høyre != null; p = p.høyre) stakk.leggInn(p);
@@ -342,35 +345,37 @@ public String omvendtString()  // iterativ inorden
 }
   
   public String høyreGren() {
+     List<T> verdier=new ArrayList<>();
       Node<T> p = rot;
-      ArrayList Q = new ArrayList<Node>();
-      Q.add(p); // Adder node p
-      int nivå = 0, maksNivå = 0;
-      while (!Q.isEmpty()) {
-          int count = Q.size();
-          // store the current size of the Q
-          nivå += 1;
-          while (count > 0) {
-              // pop the first node from the queue
-              Node NODE = (Node) Q.get(0);
-              Q.remove(0);
-              if (maksNivå < nivå) {
-                  System.out.print(NODE.verdi + " ");
-                  maksNivå = nivå;
-              }
-              if (NODE.høyre != null) {
-                  Q.add(NODE.høyre);
-              }
-              if (NODE.venstre != null) {
-                  Q.add(NODE.venstre);
-              }
-              count--;
-          }
-      }
-      return "hello";
+      System.out.println(rot);
+     if(rot==null){
+         return verdier.toString();
+     }
+     Queue<Node> kø=new LinkedList();
+     kø.add(rot);
+     while(!kø.isEmpty()){
+         int str=kø.size();
+         for(int i=0; i<str; i++){
+             Node current=kø.remove();
+             if(i==str-1 ){
+                 verdier.add((T) current.verdi);
+             }
+             if(current.venstre!=null){
+                 kø.add(current.venstre);
+             }
+             if(current.høyre!=null){
+                 kø.add(current.høyre);
+             }
+
+         }
+     }
+      return verdier.toString();
   }
-  
-  public String lengstGren()
+
+  public String lengstGren(){
+      throw new NotImplementedException();
+  }
+          /*
   {
       Node<T> p = rot;
       path[arrayCounter++] = node.data;
@@ -384,7 +389,7 @@ public String omvendtString()  // iterativ inorden
       }
 
   }
-  
+  */
   public String[] grener()
   {
     throw new UnsupportedOperationException("Ikke kodet ennå!");
@@ -442,10 +447,10 @@ public String omvendtString()  // iterativ inorden
       int [] a = {4,7,2,9,4,10,8,7,4,6,1};
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
       for ( int verdi : a) tre.leggInn(verdi);
-      tre.fjernAlle(4);
+
       //System. out .println(tre.toString()); // 5
      // System. out .println(tre + " " + tre.omvendtString());
-    tre.høyreGren();
+      System.out.println(tre.høyreGren());
 
 
 
