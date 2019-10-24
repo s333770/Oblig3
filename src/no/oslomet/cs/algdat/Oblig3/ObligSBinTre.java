@@ -341,9 +341,37 @@ public String omvendtString()  // iterativ inorden
     return s.toString();
 }
   
-  public String høyreGren()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+  public String høyreGren() {
+      Node<T> p = rot;
+      ArrayList Q = new ArrayList<Node>();
+      Q.add(p);
+      int level = 0, max_level = 0;
+      while (!Q.isEmpty()) {
+          int count = Q.size();
+          // store the current size of the Q
+          level += 1;
+          while (count > 0) {
+              // pop the first node from the queue
+              Node NODE = (Node) Q.get(0);
+              Q.remove(0);
+              if (max_level < level) {
+                  System.out.print(NODE.verdi + " ");
+                  max_level = level;
+              }
+
+              // push the right child on queue
+              if (NODE.høyre != null) {
+                  Q.add(NODE.høyre);
+              }
+
+              // push the left child on queue
+              if (NODE.venstre != null) {
+                  Q.add(NODE.venstre);
+              }
+              count--;
+          }
+      }
+      return "hello";
   }
   
   public String lengstGren()
@@ -409,9 +437,9 @@ public String omvendtString()  // iterativ inorden
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
       for ( int verdi : a) tre.leggInn(verdi);
       tre.fjernAlle(4);
-      System. out .println(tre.toString()); // 5
+      //System. out .println(tre.toString()); // 5
      // System. out .println(tre + " " + tre.omvendtString());
-
+    tre.høyreGren();
 
 
 
