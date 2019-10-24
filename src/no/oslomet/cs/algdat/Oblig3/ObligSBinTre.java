@@ -344,27 +344,23 @@ public String omvendtString()  // iterativ inorden
   public String høyreGren() {
       Node<T> p = rot;
       ArrayList Q = new ArrayList<Node>();
-      Q.add(p);
-      int level = 0, max_level = 0;
+      Q.add(p); // Adder node p
+      int nivå = 0, maksNivå = 0;
       while (!Q.isEmpty()) {
           int count = Q.size();
           // store the current size of the Q
-          level += 1;
+          nivå += 1;
           while (count > 0) {
               // pop the first node from the queue
               Node NODE = (Node) Q.get(0);
               Q.remove(0);
-              if (max_level < level) {
+              if (maksNivå < nivå) {
                   System.out.print(NODE.verdi + " ");
-                  max_level = level;
+                  maksNivå = nivå;
               }
-
-              // push the right child on queue
               if (NODE.høyre != null) {
                   Q.add(NODE.høyre);
               }
-
-              // push the left child on queue
               if (NODE.venstre != null) {
                   Q.add(NODE.venstre);
               }
@@ -376,7 +372,17 @@ public String omvendtString()  // iterativ inorden
   
   public String lengstGren()
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+      Node<T> p = rot;
+      path[arrayCounter++] = node.data;
+
+      if (node.leftNode == null && node.rightNode == null) {
+          printArray(path);
+      }
+      else {
+          printMain(node.leftNode, path, arrayCounter);
+          printMain(node.rightNode, path, arrayCounter);
+      }
+
   }
   
   public String[] grener()
