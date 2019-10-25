@@ -345,30 +345,7 @@ public String omvendtString()  // iterativ inorden
 }
   
   public String høyreGren() {
-     List<T> verdier=new ArrayList<>();
-      Node<T> p = rot;
-      System.out.println(rot);
-     if(rot==null){
-         return verdier.toString();
-     }
-     Queue<Node> kø=new LinkedList();
-     kø.add(rot);
-     while(!kø.isEmpty()){
-         int str=kø.size();
-         for(int i=0; i<str; i++){
-             Node current=kø.remove();
-             if(i==str-1 ){
-                 verdier.add((T) current.verdi);
-             }
-             if(current.venstre!=null){
-                 kø.add(current.venstre);
-             }
-             if(current.høyre!=null){
-                 kø.add(current.høyre);
-             }
 
-         }
-     }
       return verdier.toString();
   }
 
