@@ -288,6 +288,7 @@ public class ObligSBinTre<T> implements Beholder<T>
       s.append(',').append(' ');
     }
 
+
     s.append(p.verdi);
 
     if (p.høyre != null)
@@ -345,28 +346,65 @@ public String omvendtString()  // iterativ inorden
 }
   
   public String høyreGren() {
-
-      return verdier.toString();
-  }
-
-  public String lengstGren(){
-      throw new NotImplementedException();
-  }
-          /*
-  {
-      Node<T> p = rot;
-      path[arrayCounter++] = node.data;
-
-      if (node.leftNode == null && node.rightNode == null) {
-          printArray(path);
+      List<T> ut=new ArrayList<>();
+      Queue<Node> queue=new LinkedList<>();
+      if(rot==null){
+          return ut.toString();
       }
-      else {
-          printMain(node.leftNode, path, arrayCounter);
-          printMain(node.rightNode, path, arrayCounter);
-      }
+      queue.offer(rot);
+      while(queue.size()!=0){
+          int str=queue.size();
+          for(int i=0;i<str;i++){
+              Node denne=queue.poll();
+              if(i==0){
+                  ut.add((T) denne.verdi);
+              }
+              if(denne.høyre!=null){
+                  queue.offer(denne.høyre);
+              }
+              if(denne.venstre!=null){
+                  queue.offer(denne.venstre);
+              }
+          }
 
+      }
+      return ut.toString();
   }
-  */
+
+public String lengstGren() {
+    Stack<Node> stakk=new Stack<Node>();
+    Node<T> p=rot;
+    stakk.push(p);
+    while(!stakk.isEmpty()){
+        System.out.println(stakk.toString());
+        p=stakk.remove(0);
+
+
+    if(p.høyre!=null){
+        stakk.add(p.høyre);
+    }
+    if(p.venstre!=null){
+        stakk.add(p.venstre);
+    }
+    }
+    T verdi=p.verdi;
+    StringBuilder s=new StringBuilder();
+    Queue<Node> kø=new LinkedList<Node>();
+    kø.add(p);
+    while(p.forelder!=null){
+        p=p.forelder;
+        kø.add(p);
+    }
+    s.append(kø.remove());
+    while(!kø.isEmpty()){
+        s.append(",").append(kø.remove());
+    }
+    s.append("]");
+
+
+    return s.toString();
+}
+
   public String[] grener()
   {
     throw new UnsupportedOperationException("Ikke kodet ennå!");
@@ -420,14 +458,18 @@ public String omvendtString()  // iterativ inorden
   } // BladnodeIterator
 
   public static void main(String[] args) {
-
-      int [] a = {4,7,2,9,4,10,8,7,4,6,1};
+    int [] a={2,1,7,6,10,5,4};
+      //int [] a = {4,7,2,9,4,10,8,7,4,6,1};
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
       for ( int verdi : a) tre.leggInn(verdi);
 
       //System. out .println(tre.toString()); // 5
      // System. out .println(tre + " " + tre.omvendtString());
+      tre.høyreGren();
       System.out.println(tre.høyreGren());
+      tre.lengstGren();
+      System.out.println(tre.lengstGren());
+
 
 
 
