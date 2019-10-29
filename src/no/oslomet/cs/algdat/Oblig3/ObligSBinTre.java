@@ -256,14 +256,35 @@ public class ObligSBinTre<T> implements Beholder<T>
   @Override
   public void nullstill()
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+      if (!tom()) nullstill(rot);  // nullstiller
+      rot = null; antall = 0;      // treet er nå tomt
   }
+
+    private void nullstill(Node<T> p)
+    {
+        if (p.venstre != null)
+        {
+            nullstill(p.venstre);      // venstre subtre
+            p.venstre = null;          // nuller peker
+        }
+        if (p.høyre != null)
+        {
+            nullstill(p.høyre);        // høyre subtre
+            p.høyre = null;            // nuller peker
+        }
+        p.verdi = null;              // nuller verdien
+    }
   private static <T> Node<T> førsteInorden(Node<T> p)
   {
     while (p.venstre != null) p = p.venstre;
     return p;
   }
+  /*
+  private static<T> Node <T> lengsteGren2(Node<T> p){
 
+
+  }
+*/
   private static <T> Node<T> nesteInorden(Node<T> p)
   {
     if (p.høyre != null)  // p har høyre barn
@@ -321,7 +342,10 @@ public String omvendtString()  // iterativ inorden
 
     StringBuilder s = new StringBuilder();
 
-    for ( ; p.høyre != null; p = p.høyre) stakk.leggInn(p);
+    for ( ; p.høyre != null; p = p.høyre)
+    {
+        stakk.leggInn(p);
+    }
 
     while (true)
     {
@@ -411,8 +435,7 @@ public String lengstGren() {
       StringBuilder s = new StringBuilder("[");
       if (!tom()) grener(rot, liste, s);
 
-      String[] grener =
-              new String[liste.antall()];           // oppretter tabell
+      String[] grener = new String[liste.antall()];           // oppretter tabell
 
       int i = 0;
       for (String gren : liste)
@@ -443,14 +466,53 @@ public String lengstGren() {
   
   public String bladnodeverdier()
   {
-    Node<T> p=rot;
+      Node<T> p=rot;
+      StringBuilder s = new StringBuilder("[");
+      if (!tom()) bladnodeverdier(rot,s);
 
+      s.append("]");
+    return s.toString();
   }
-  
-  public String postString()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+  public String bladnodeverdier(Node<T> p,StringBuilder s){
+      if (p.venstre == null && p.høyre == null) {
+          s.append(p.verdi);
+          s.append(", ");
+      }
+      if(p.venstre!=null){
+          bladnodeverdier(p.venstre,s);
+      }
+      if(p.høyre!=null){
+          bladnodeverdier(p.høyre,s);
+      }
+      return s.toString();
   }
+  //Eksperimentell kode, kopiert fra GeeksForGeeks
+  public String postString(){
+      String StringUt="";
+      Node<T> p=rot;
+      Stack<Node<T>> stakk=new Stack<>();
+      stakk.push(p);
+      Stack<T>ut=new Stack<>();
+      while(!stakk.isEmpty()){
+           Node denne=stakk.pop();
+           ut.push((T) denne.verdi);
+          if (denne.venstre != null) {
+              stakk.push(denne.venstre);
+          }
+
+          if (denne.høyre != null) {
+              stakk.push(denne.høyre);
+          }
+      }
+
+      // print post-order traversal
+      while (!ut.empty()) {
+          StringUt+=ut.pop();
+
+      }
+return StringUt.toString();
+      }
+
   
   @Override
   public Iterator<T> iterator()
@@ -466,7 +528,9 @@ public String lengstGren() {
     
     private BladnodeIterator()  // konstruktør
     {
-      throw new UnsupportedOperationException("Ikke kodet ennå!");
+        while (true){
+            if
+    }
     }
 
     @Override
@@ -490,12 +554,19 @@ public String lengstGren() {
   } // BladnodeIterator
 
   public static void main(String[] args) {
-    int [] a={2,1,7,6,10,5,4};
-      ObligSBinTre<Character> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
-      char [] verdier = "IATBHJCRSOFELKGDMPQN" .toCharArray();
-      for ( char c : verdier) tre.leggInn(c);
-      String[] s = tre.grener();
-      for (String gren : s) System. out .println(gren);
+    /*
+      int [] a={2,1,7,6,10,5,4};
+      ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
+      for ( int verdi : a) tre.leggInn(verdi);
+
+
+
+     // for (String gren : s) System. out .println(gren);
+      System. out .println(tre.bladnodeverdier());
+      System. out .println(tre.postString());
+
+      */
+
       //int [] a = {4,7,2,9,4,10,8,7,4,6,1};
       //ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
       //for ( int verdi : a) tre.leggInn(verdi);
@@ -506,6 +577,11 @@ public String lengstGren() {
       //System.out.println(tre.høyreGren());
       //tre.lengstGren();
       //System.out.println(tre.lengstGren());
+      ObligSBinTre<Character> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
+      char [] verdier = "IATBHJCRSOFELKGDMPQN" .toCharArray();
+      for ( char c : verdier) tre.leggInn(c);
+      tre.postString();
+      System.out.println(tre.postString());
 
 
 
