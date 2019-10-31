@@ -525,12 +525,34 @@ return StringUt.toString();
     private Node<T> p = rot, q = null;
     private boolean removeOK = false;
     private int iteratorendringer = endringer;
+    private Stakk<Node<T>> s=new TabellStakk<>();
+
     
     private BladnodeIterator()  // konstruktør
     {
-        while (true){
-            if
+       if(rot==null){
+           return;
+       }
+       p=forsteVenstre(rot);
+
     }
+    private Node<T> forsteVenstre(Node <T> p){
+        while(p!=null){
+            if(p.venstre ==null &&p.høyre==null){
+                break;
+            }
+            if(p.venstre!=null){
+                if(p.høyre!=null){
+                    s.leggInn(p.høyre);
+                }
+                p=p.venstre;
+            }
+            else{
+                p=p.høyre;
+            }
+
+        }
+        return p;
     }
 
     @Override
@@ -542,13 +564,52 @@ return StringUt.toString();
     @Override
     public T next()
     {
-      throw new UnsupportedOperationException("Ikke kodet ennå!");
+
+        T verdi=p.verdi;
+        if(!s.tom()){
+            p=forsteVenstre(s.taUt());
+        }
+        else{
+            p=null;
+        }
+
+
+        removeOK=true;
+        q=p;
+
+        while(hasNext()){
+            p=nesteInorden(p);
+            if(p==null){
+                return verdi;
+            }
+            if(p.venstre==null && p.høyre==null){
+                return verdi;
+            }
+        }
+        return verdi;
+
+
     }
     
     @Override
     public void remove()
     {
-      throw new UnsupportedOperationException("Ikke kodet ennå!");
+
+         if(q.forelder==null) {
+             rot = null;
+         }
+        else{
+            if(q.forelder.venstre==q){
+                q.forelder.venstre=null;
+            }
+            else{
+                q.forelder.høyre=null;
+            }
+        }
+        antall--;
+        endringer++;
+        iteratorendringer++;
+
     }
 
   } // BladnodeIterator
@@ -582,6 +643,13 @@ return StringUt.toString();
       for ( char c : verdier) tre.leggInn(c);
       tre.postString();
       System.out.println(tre.postString());
+
+      for (Character c : tre) System. out .print(c + " " );
+      while (!tre.tom())
+      {
+          System. out .println(tre);
+          tre.fjernHvis(x -> true );
+      }
 
 
 
