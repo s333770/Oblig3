@@ -7,146 +7,153 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import javax.swing.tree.TreeNode;
 import java.util.*;
 
-public class ObligSBinTre<T> implements Beholder<T>
-{
-  private static final class Node<T>   // en indre nodeklasse
-  {
-    private T verdi;                   // nodens verdi
-    private Node<T> venstre, høyre;    // venstre og høyre barn
-    private Node<T> forelder;          // forelder
-
-    // konstruktør
-    private Node(T verdi, Node<T> v, Node<T> h, Node<T> forelder)
+public class ObligSBinTre<T> implements Beholder<T> {
+    private static final class Node<T>   // en indre nodeklasse
     {
-      this.verdi = verdi;
-      venstre = v;
-      høyre = h;
-      this.forelder = forelder;
-    }
+        private T verdi;                   // nodens verdi
+        private Node<T> venstre, høyre;    // venstre og høyre barn
+        private Node<T> forelder;          // forelder
 
-    private Node(T verdi, Node<T> forelder)  // konstruktør
+        // konstruktør
+        private Node(T verdi, Node<T> v, Node<T> h, Node<T> forelder) {
+            this.verdi = verdi;
+            venstre = v;
+            høyre = h;
+            this.forelder = forelder;
+        }
+
+        private Node(T verdi, Node<T> forelder)  // konstruktør
+        {
+            this(verdi, null, null, forelder);
+        }
+
+
+        @Override
+        public String toString() {
+            return "" + verdi;
+        }
+
+    } // class Node
+
+    private Node<T> rot;                            // peker til rotnoden
+    private int antall;                             // antall noder
+    private int endringer;                          // antall endringer
+
+    private final Comparator<? super T> comp;       // komparator
+
+    public ObligSBinTre(Comparator<? super T> c)    // konstruktør
     {
-      this(verdi, null, null, forelder);
+        rot = null;
+        antall = 0;
+        comp = c;
     }
-
 
     @Override
-    public String toString(){ return "" + verdi;}
+    public boolean leggInn(T verdi) {
+        Objects.requireNonNull(verdi, "Ikke lov med null verdier");
+        Node<T> p = rot, q = null; //p = root, Node q er en null verdi
+        int cmp = 0;
 
-  } // class Node
-
-  private Node<T> rot;                            // peker til rotnoden
-  private int antall;                             // antall noder
-  private int endringer;                          // antall endringer
-
-  private final Comparator<? super T> comp;       // komparator
-
-  public ObligSBinTre(Comparator<? super T> c)    // konstruktør
-  {
-    rot = null;
-    antall = 0;
-    comp = c;
-  }
-  @Override
-  public boolean leggInn(T verdi){
-    Objects.requireNonNull(verdi,"Ikke lov med null verdier");
-    Node<T> p=rot, q=null; //p = root, Node q er en null verdi
-    int cmp=0;
-
-    while(p!=null) {
-      q = p;
-      cmp = comp.compare(verdi, p.verdi);
-      p = cmp < 0 ? p.venstre : p.høyre; // Hvis cmp er mindre enn null er p lik pvenstre, ellers høyre
+        while (p != null) {
+            q = p;
+            cmp = comp.compare(verdi, p.verdi);
+            p = cmp < 0 ? p.venstre : p.høyre; // Hvis cmp er mindre enn null er p lik pvenstre, ellers høyre
+        }
+        p = new Node<>(verdi, q); // q er forelderen til p
+        if (q == null) {
+            rot = p;
+        } else if (cmp < 0) {
+            q.venstre = p;
+        } else {
+            q.høyre = p;
+        }
+        antall++;
+        return true;
     }
-      p=new Node<>(verdi,q); // q er forelderen til p
-    if(q==null) {
-      rot = p;
-    }
-    else if (cmp<0) {
-      q.venstre = p;
-    }
-    else {
-      q.høyre = p;
-    }
-    antall++;
-    return true;
-  }
-  
-  @Override
-  public boolean inneholder(T verdi)
-  {
-    if (verdi == null) return false;
 
-    Node<T> p = rot;
+    @Override
+    public boolean inneholder(T verdi) {
+        if (verdi == null) return false;
 
-    while (p != null)
+        Node<T> p = rot;
+
+        while (p != null) {
+            int cmp = comp.compare(verdi, p.verdi);
+            if (cmp < 0) p = p.venstre;
+            else if (cmp > 0) p = p.høyre;
+            else return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean fjern(T verdi)  // hører til klassen SBinTre
     {
-      int cmp = comp.compare(verdi, p.verdi);
-      if (cmp < 0) p = p.venstre;
-      else if (cmp > 0) p = p.høyre;
-      else return true;
-    }
+        if (verdi == null) return false;  // treet har ingen nullverdier
 
-    return false;
-  }
-  
-  @Override
-  public boolean fjern(T verdi)  // hører til klassen SBinTre
-  {
-      if (verdi == null) return false;  // treet har ingen nullverdier
+        Node<T> p = rot, q = null;   // q skal være forelder til p
 
-      Node<T> p = rot, q = null;   // q skal være forelder til p
+        while (p != null)            // leter etter verdi
+        {
+            int cmp = comp.compare(verdi, p.verdi);      // sammenligner
+            if (cmp < 0) {
+                q = p;
+                p = p.venstre;
+            }      // går til venstre
+            else if (cmp > 0) {
+                q = p;
+                p = p.høyre;
+            }   // går til høyre
+            else break;    // den søkte verdien ligger i p
+        }
+        if (p == null) return false;   // finner ikke verdi
 
-      while (p != null)            // leter etter verdi
-      {
-          int cmp = comp.compare(verdi,p.verdi);      // sammenligner
-          if (cmp < 0) {
-              q = p; p = p.venstre;
-          }      // går til venstre
-          else if (cmp > 0) {
-              q = p; p = p.høyre;
-          }   // går til høyre
-          else break;    // den søkte verdien ligger i p
-      }
-      if (p == null) return false;   // finner ikke verdi
+        if (p.venstre == null || p.høyre == null)  // Tilfelle 1) og 2)
+        {
+            Node<T> b = p.venstre != null ? p.venstre : p.høyre;  // b for barn
+            if (p == rot) rot = b;
+            else if (p == q.venstre){
+                q.venstre = b;
+                if(b!=null){
+                    b.forelder=q;
+                }
+            }
+            else {
+                q.høyre = b;
+                if(b!= null) {
+                    b.forelder = q;
+                }
+            }
+        } else  // Tilfelle 3)
+        {
+            Node<T> s = p, r = p.høyre;   // finner neste i inorden
+            while (r.venstre != null) {
+                s = r;    // s er forelder til r
+                r = r.venstre;
+            }
 
-      if (p.venstre == null || p.høyre == null)  // Tilfelle 1) og 2)
-      {
-          Node<T> b = p.venstre != null ? p.venstre : p.høyre;  // b for barn
-          if (p == rot) {
-              rot = b;
-          }
-          else if (p == q.venstre){
-              p.verdi=b.verdi;
-              q.venstre = p;
-              p.venstre=null;
-          }
-          else{
-              q.høyre = b;
-          }
-      }
-      else  // Tilfelle 3)
-      {
-          Node<T> s = p, r = p.høyre;   // finner neste i inorden
-          while (r.venstre != null)
-          {
-              s = r;    // s er forelder til r
-              r = r.venstre;
-          }
+            p.verdi = r.verdi;   // kopierer verdien i r til p
 
-          p.verdi = r.verdi;   // kopierer verdien i r til p
+            if (s != p) {
+                s.venstre = r.høyre;
+                if (r.høyre != null) {
+                    r.forelder.høyre = s;
+                } else {
+                  //  s.høyre = r.høyre;
+                    if (r.høyre != null) {
+                        r.forelder.høyre = s;
 
-          if (s != p) {
-              s.venstre = r.høyre;
-          }
-          else {
-              s.høyre = r.høyre;
-          }
-      }
+                    }
+                }
+            }
+        }
 
-      antall--;   // det er nå én node mindre i treet
-      return true;
-  }
+        antall--;   // det er nå én node mindre i treet
+            endringer++;
+        return true;
+}
+
 
   public int fjernAlle(T verdi)
   {
@@ -276,6 +283,9 @@ public class ObligSBinTre<T> implements Beholder<T>
     }
   private static <T> Node<T> førsteInorden(Node<T> p)
   {
+      if(p==null){
+          return p;
+      }
     while (p.venstre != null) p = p.venstre;
     return p;
   }
@@ -287,6 +297,9 @@ public class ObligSBinTre<T> implements Beholder<T>
 */
   private static <T> Node<T> nesteInorden(Node<T> p)
   {
+      if(p==null){
+          return null;
+      }
     if (p.høyre != null)  // p har høyre barn
     {
       return førsteInorden(p.høyre);
@@ -325,13 +338,20 @@ public class ObligSBinTre<T> implements Beholder<T>
   {
       Node<T> p =førsteInorden(rot);
       StringBuilder s = new StringBuilder();
+      if(p==null){
+          s.append("[]");
+          return s.toString();
+      }
     s.append('[');
     while(p!=null){
         s.append(p.verdi);
-        s.append(" ");
-            p=nesteInorden(p);
+        p=nesteInorden(p);
+        s.append(", ");
         }
-    s.append(']');
+
+
+    s.setLength(s.length()-2);// For å fjerne komma
+      s.append(']');
     return s.toString();
   }
 
@@ -339,9 +359,12 @@ public String omvendtString()  // iterativ inorden
 {
     Stakk<Node<T>> stakk = new TabellStakk<>();
     Node<T> p = rot;   // starter i roten og går til venstre
-
     StringBuilder s = new StringBuilder();
-
+    s.append("[");
+    if(p==null){
+        s.append("]");
+        return s.toString();
+    }
     for ( ; p.høyre != null; p = p.høyre)
     {
         stakk.leggInn(p);
@@ -349,9 +372,8 @@ public String omvendtString()  // iterativ inorden
 
     while (true)
     {
-        s.append('[');
         s.append(p.verdi);
-        s.append("] ,");
+        s.append(", ");
         if (p.venstre != null)          // til venstre i høyre subtre
         {
             for (p = p.venstre; p.høyre != null; p = p.høyre)
@@ -366,6 +388,9 @@ public String omvendtString()  // iterativ inorden
         else break;          // stakken er tom - vi er ferdig
 
     } // while
+    s.setLength(s.length() - 2);
+    s.append("]");
+
     return s.toString();
 }
   
@@ -615,45 +640,27 @@ return StringUt.toString();
   } // BladnodeIterator
 
   public static void main(String[] args) {
-    /*
-      int [] a={2,1,7,6,10,5,4};
+      String s;
+      no.oslomet.cs.algdat.Oblig3.ObligSBinTre<Integer> tre =
+              new ObligSBinTre<>(Comparator.naturalOrder());
+      int[] a = {6, 3, 9, 1, 5, 7, 10, 2, 4, 8, 11, 6, 8};
+      for (int verdi : a) tre.leggInn(verdi);
+      tre.fjern(6);
+
+
+      //tre.fjern(2);
+
+      s = tre.toString();
+      System.out.println(s);
+
+      /*
+      int[] a = {6, 3, 9, 1, 5, 7, 10, 2, 4, 8, 11, 6, 8};
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
       for ( int verdi : a) tre.leggInn(verdi);
+      tre.fjernAlle(7);
+      System. out .println(tre);
+       */// 5
 
-
-
-     // for (String gren : s) System. out .println(gren);
-      System. out .println(tre.bladnodeverdier());
-      System. out .println(tre.postString());
-
-      */
-
-      //int [] a = {4,7,2,9,4,10,8,7,4,6,1};
-      //ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
-      //for ( int verdi : a) tre.leggInn(verdi);
-
-      //System. out .println(tre.toString()); // 5
-     // System. out .println(tre + " " + tre.omvendtString());
-      //tre.høyreGren();
-      //System.out.println(tre.høyreGren());
-      //tre.lengstGren();
-      //System.out.println(tre.lengstGren());
-      ObligSBinTre<Character> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
-      char [] verdier = "IATBHJCRSOFELKGDMPQN" .toCharArray();
-      for ( char c : verdier) tre.leggInn(c);
-      tre.postString();
-      System.out.println(tre.postString());
-
-      for (Character c : tre) System. out .print(c + " " );
-      while (!tre.tom())
-      {
-          System. out .println(tre);
-          tre.fjernHvis(x -> true );
-      }
-
-
-
-
+      //System. out .println(tre + " " + tre.omvendtString());
   }
-
 } // ObligSBinTre
