@@ -731,6 +731,7 @@ public class Oblig3Test {
         tre.forEach(verdi -> liste.add(verdi));
         String s = liste.toString();
 
+
         if (!s.equals("[1, 3, 7, 9]")) {
             antallFeil++;
             System.out.println

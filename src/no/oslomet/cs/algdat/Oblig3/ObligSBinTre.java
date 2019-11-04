@@ -289,12 +289,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
     while (p.venstre != null) p = p.venstre;
     return p;
   }
-  /*
-  private static<T> Node <T> lengsteGren2(Node<T> p){
 
-
-  }
-*/
   private static <T> Node<T> nesteInorden(Node<T> p)
   {
       if(p==null){
@@ -423,9 +418,14 @@ public String omvendtString()  // iterativ inorden
 public String lengstGren() {
     Stack<Node> stakk=new Stack<Node>();
     Node<T> p=rot;
+    StringBuilder s=new StringBuilder();
+
+    if(p==null){
+        s.append("[]");
+        return s.toString();
+    }
     stakk.push(p);
     while(!stakk.isEmpty()){
-        System.out.println(stakk.toString());
         p=stakk.remove(0);
 
 
@@ -437,20 +437,18 @@ public String lengstGren() {
     }
     }
     T verdi=p.verdi;
-    StringBuilder s=new StringBuilder();
-    Queue<Node> kø=new LinkedList<Node>();
+    s.append("[");
+    Stack<Node> kø=new Stack<Node>();
     kø.add(p);
     while(p.forelder!=null){
         p=p.forelder;
         kø.add(p);
     }
-    s.append(kø.remove());
+    s.append(kø.pop());
     while(!kø.isEmpty()){
-        s.append(",").append(kø.remove());
+        s.append(", ").append(kø.pop());
     }
     s.append("]");
-
-
     return s.toString();
 }
 
@@ -493,12 +491,22 @@ public String lengstGren() {
   {
       Node<T> p=rot;
       StringBuilder s = new StringBuilder("[");
-      if (!tom()) bladnodeverdier(rot,s);
-
+      if(p==null){
+          s.append("]");
+          return s.toString();
+      }
+      if (!tom()){
+          bladnodeverdier(rot,s);
+      }
+      s.setLength(s.length()-2);
       s.append("]");
     return s.toString();
   }
   public String bladnodeverdier(Node<T> p,StringBuilder s){
+      if(p==null){
+          s.append("[]");
+          return s.toString();
+      }
       if (p.venstre == null && p.høyre == null) {
           s.append(p.verdi);
           s.append(", ");
@@ -509,18 +517,22 @@ public String lengstGren() {
       if(p.høyre!=null){
           bladnodeverdier(p.høyre,s);
       }
+
       return s.toString();
   }
-  //Eksperimentell kode, kopiert fra GeeksForGeeks
   public String postString(){
-      String StringUt="";
+      StringBuilder ut=new StringBuilder();
       Node<T> p=rot;
+      if(p==null){
+          ut.append("[]");
+          return ut.toString();
+      }
       Stack<Node<T>> stakk=new Stack<>();
       stakk.push(p);
-      Stack<T>ut=new Stack<>();
+      Stack<T>utStack=new Stack<>();
       while(!stakk.isEmpty()){
            Node denne=stakk.pop();
-           ut.push((T) denne.verdi);
+           utStack.push((T) denne.verdi);
           if (denne.venstre != null) {
               stakk.push(denne.venstre);
           }
@@ -529,13 +541,15 @@ public String lengstGren() {
               stakk.push(denne.høyre);
           }
       }
-
-      // print post-order traversal
-      while (!ut.empty()) {
-          StringUt+=ut.pop();
-
+      ut.append("[");
+      while (!utStack.empty()) {
+          ut.append(utStack.pop());
+        ut.append(", ");
       }
-return StringUt.toString();
+
+      ut.setLength(ut.length()-2);
+      ut.append("]");
+    return ut.toString();
       }
 
   
@@ -556,8 +570,8 @@ return StringUt.toString();
     private BladnodeIterator()  // konstruktør
     {
        if(rot==null){
-           return;
-       }
+           throw new NoSuchElementException();
+           }
        p=forsteVenstre(rot);
 
     }
@@ -577,6 +591,7 @@ return StringUt.toString();
             }
 
         }
+        System.out.println("Første venstre er p"+p.verdi);
         return p;
     }
 
@@ -640,27 +655,18 @@ return StringUt.toString();
   } // BladnodeIterator
 
   public static void main(String[] args) {
-      String s;
       no.oslomet.cs.algdat.Oblig3.ObligSBinTre<Integer> tre =
               new ObligSBinTre<>(Comparator.naturalOrder());
-      int[] a = {6, 3, 9, 1, 5, 7, 10, 2, 4, 8, 11, 6, 8};
-      for (int verdi : a) tre.leggInn(verdi);
-      tre.fjern(6);
 
 
-      //tre.fjern(2);
+      int[] a = {5, 2, 8, 1, 4, 6, 9, 3, 7};
+      for (int k : a) tre.leggInn(k);
 
-      s = tre.toString();
-      System.out.println(s);
+      Iterator<Integer> i = tre.iterator();
+      List<Integer> liste = new ArrayList<>();
+      tre.forEach(verdi -> liste.add(verdi));
+      String s = liste.toString();
+      System.out.println(s.toString());
 
-      /*
-      int[] a = {6, 3, 9, 1, 5, 7, 10, 2, 4, 8, 11, 6, 8};
-      ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
-      for ( int verdi : a) tre.leggInn(verdi);
-      tre.fjernAlle(7);
-      System. out .println(tre);
-       */// 5
-
-      //System. out .println(tre + " " + tre.omvendtString());
   }
 } // ObligSBinTre
