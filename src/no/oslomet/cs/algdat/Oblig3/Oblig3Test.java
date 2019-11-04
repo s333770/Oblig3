@@ -687,8 +687,7 @@ public class Oblig3Test {
         no.oslomet.cs.algdat.Oblig3.ObligSBinTre<Integer> tre =
                 new ObligSBinTre<>(Comparator.naturalOrder());
 
-        Iterator<Integer> i = tre.iterator();
-
+/*
         try {
             i.next();
             antallFeil++;
@@ -700,8 +699,10 @@ public class Oblig3Test {
                         ("Oppgave 9b: Skal kaste NoSuchElementException her!");
             }
         }
-
+*/
         tre.leggInn(10);
+        Iterator<Integer> i = tre.iterator();
+
         i = tre.iterator();
 
         if (i.next().compareTo(10) != 0) {

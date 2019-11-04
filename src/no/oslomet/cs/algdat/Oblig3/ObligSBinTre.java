@@ -68,6 +68,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
             q.høyre = p;
         }
         antall++;
+        endringer++;
         return true;
     }
 
@@ -280,6 +281,8 @@ public class ObligSBinTre<T> implements Beholder<T> {
             p.høyre = null;            // nuller peker
         }
         p.verdi = null;              // nuller verdien
+        endringer=0;
+        antall=0;
     }
   private static <T> Node<T> førsteInorden(Node<T> p)
   {
@@ -591,7 +594,6 @@ public String lengstGren() {
             }
 
         }
-        System.out.println("Første venstre er p"+p.verdi);
         return p;
     }
 
@@ -600,35 +602,41 @@ public String lengstGren() {
     {
       return p != null;  // Denne skal ikke endres!
     }
-    
+
+
     @Override
     public T next()
     {
-
         T verdi=p.verdi;
         if(!s.tom()){
             p=forsteVenstre(s.taUt());
+            return verdi;
         }
         else{
-            p=null;
+           p=null;
         }
 
-
-        removeOK=true;
         q=p;
 
         while(hasNext()){
             p=nesteInorden(p);
+
             if(p==null){
                 return verdi;
             }
-            if(p.venstre==null && p.høyre==null){
+            else if(p.venstre==null && p.høyre==null){
                 return verdi;
             }
+            else if(p.venstre!=null &&p.høyre==null){
+                return p.venstre.verdi;
+            }
+            else if(p.høyre!=null &&p.venstre==null){
+                return p.høyre.verdi;
+            }
+
         }
+        removeOK=true;
         return verdi;
-
-
     }
     
     @Override
@@ -664,9 +672,17 @@ public String lengstGren() {
 
       Iterator<Integer> i = tre.iterator();
       List<Integer> liste = new ArrayList<>();
-      tre.forEach(verdi -> liste.add(verdi));
+      for (Integer verdi : tre) {
+          liste.add(verdi);
+      }
       String s = liste.toString();
       System.out.println(s.toString());
+      tre.nullstill();
+      tre.leggInn(1);
+      i = tre.iterator();
+      tre.leggInn(2);
+      System.out.println(i.next());
+
 
   }
 } // ObligSBinTre
