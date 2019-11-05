@@ -609,7 +609,7 @@ public String lengstGren() {
           if(endringer!=iteratorendringer){
               throw new ConcurrentModificationException("Antallet endringer stemmer ikke ");
           }
-          q=p;// Setter q til p for at
+          q=p;// Setter q til p for å bruke forelder til traversering
           T tempVariabel = p.verdi;// Lager en tempvariabel som skal hjelpe oss med traversering
           removeOK=true; // Kan fjerne verdier
           while (hasNext()) {
