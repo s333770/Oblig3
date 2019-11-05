@@ -656,6 +656,7 @@ public String lengstGren() {
       String s[] = tre.grener();
       Iterator<Integer> i = tre.iterator();
       System.out.println( i.next() );
+      System.out.println(i.next());
 
 
   }
