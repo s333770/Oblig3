@@ -609,18 +609,20 @@ public String lengstGren() {
           if(endringer!=iteratorendringer){
               throw new ConcurrentModificationException("Antallet endringer stemmer ikke ");
           }
-          T temp = p.verdi;// Lager en tempvariabel som skal hjelpe oss med traversering
+          q=p;// Setter q til p for at
+          T tempVariabel = p.verdi;// Lager en tempvariabel som skal hjelpe oss med traversering
           removeOK=true; // Kan fjerne verdier
           while (hasNext()) {
               p = nesteInorden(p); // Bruker neste Inorder for å traversere
               if (p == null) {
-                  return temp;
+                  return tempVariabel;
               }
               else if (p.venstre == null && p.høyre == null) {
-                  return temp;
+                  return tempVariabel;
               }
           }
-          return temp;
+
+          return tempVariabel;
       }
           @Override
           public void remove ()
@@ -651,13 +653,13 @@ public String lengstGren() {
   public static void main(String[] args) {
 
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
-      int[] a = {4, 1, 6, 3, 5, 8, 2, 7, 9};
-      for (int verdi : a) tre.leggInn(verdi);
-      String s[] = tre.grener();
+      tre.leggInn(1);
+      tre.leggInn(2);
       Iterator<Integer> i = tre.iterator();
-      System.out.println( i.next() );
-      System.out.println(i.next());
-
+      i = tre.iterator();
+      Iterator<Integer> j = tre.iterator();
+      i.next();
+      i.remove();
 
   }
 }
