@@ -678,7 +678,6 @@ public class Oblig3Test {
         assertEquals(antallFeil, 0);
     }  // slutt på Oppgave 8
 
-
     // OPPGAVE 9 ////////////////////////////////////////////////
     @org.junit.jupiter.api.Test
     void oppgave9() {
@@ -687,7 +686,8 @@ public class Oblig3Test {
         no.oslomet.cs.algdat.Oblig3.ObligSBinTre<Integer> tre =
                 new ObligSBinTre<>(Comparator.naturalOrder());
 
-/*
+       Iterator<Integer> i = tre.iterator();
+
         try {
             i.next();
             antallFeil++;
@@ -699,10 +699,8 @@ public class Oblig3Test {
                         ("Oppgave 9b: Skal kaste NoSuchElementException her!");
             }
         }
-*/
-        tre.leggInn(10);
-        Iterator<Integer> i = tre.iterator();
 
+        tre.leggInn(10);
         i = tre.iterator();
 
         if (i.next().compareTo(10) != 0) {
@@ -731,7 +729,6 @@ public class Oblig3Test {
         List<Integer> liste = new ArrayList<>();
         tre.forEach(verdi -> liste.add(verdi));
         String s = liste.toString();
-
 
         if (!s.equals("[1, 3, 7, 9]")) {
             antallFeil++;
@@ -960,3 +957,5 @@ public class Oblig3Test {
     }  // slutt på Oppgave 10
 
 } // Oblig3Test
+
+    

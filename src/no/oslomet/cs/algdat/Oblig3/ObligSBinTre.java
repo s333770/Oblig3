@@ -569,16 +569,30 @@ public String lengstGren() {
     private int iteratorendringer = endringer;
     private Stakk<Node<T>> s=new TabellStakk<>();
 
-    
+
     private BladnodeIterator()  // konstruktør
     {
-       if(rot==null){
-           throw new NoSuchElementException();
-           }
        p=forsteVenstre(rot);
-
     }
-    private Node<T> forsteVenstre(Node <T> p){
+
+    private Node<T> forsteVenstre(Node <T> p) {
+
+        while(true){
+            if(p.venstre!=null)
+            {
+                p=p.venstre;
+            }
+            else if(p.venstre==null && p.høyre!=null){
+                p=p.høyre;
+            }
+            if(p.venstre==null && p.høyre==null){
+                break;
+            }
+        }
+        return p;
+    }
+
+        /*
         while(p!=null){
             if(p.venstre ==null &&p.høyre==null){
                 break;
@@ -596,6 +610,8 @@ public String lengstGren() {
         }
         return p;
     }
+    */
+
 
     @Override
     public boolean hasNext()
@@ -605,39 +621,51 @@ public String lengstGren() {
 
 
     @Override
-    public T next()
-    {
-        T verdi=p.verdi;
-        if(!s.tom()){
-            p=forsteVenstre(s.taUt());
+    public T next() {
+
+        while (true) {
+            p = p.forelder;
+            if (p.høyre != null) {
+                p = p.høyre;
+                forsteVenstre(p);
+                break;
+            } else {
+                p = p.forelder;
+            }
+        }
+        return (T) p;
+    }
+
+
+
+
+        /*
+        T verdi = p.verdi;
+        if (!s.tom()) {
+            p = forsteVenstre(s.taUt());
             return verdi;
+        } else {
+            p = null;
         }
-        else{
-           p=null;
-        }
+        q = p;
+        while (hasNext()) {
+            p = nesteInorden(p);
 
-        q=p;
-
-        while(hasNext()){
-            p=nesteInorden(p);
-
-            if(p==null){
+            if (p == null) {
                 return verdi;
-            }
-            else if(p.venstre==null && p.høyre==null){
+            } else if (p.venstre == null && p.høyre == null) {
                 return verdi;
-            }
-            else if(p.venstre!=null &&p.høyre==null){
+            } else if (p.venstre != null && p.høyre == null) {
                 return p.venstre.verdi;
-            }
-            else if(p.høyre!=null &&p.venstre==null){
+            } else if (p.høyre != null && p.venstre == null) {
                 return p.høyre.verdi;
             }
 
+
         }
-        removeOK=true;
-        return verdi;
-    }
+        */
+
+
     
     @Override
     public void remove()
@@ -672,16 +700,14 @@ public String lengstGren() {
 
       Iterator<Integer> i = tre.iterator();
       List<Integer> liste = new ArrayList<>();
-      for (Integer verdi : tre) {
+      /*for (Integer verdi : tre) {
           liste.add(verdi);
       }
-      String s = liste.toString();
-      System.out.println(s.toString());
-      tre.nullstill();
-      tre.leggInn(1);
-      i = tre.iterator();
-      tre.leggInn(2);
-      System.out.println(i.next());
+      */
+
+      System.out.println(tre);
+
+
 
 
   }
