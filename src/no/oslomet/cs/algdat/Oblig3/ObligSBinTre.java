@@ -116,15 +116,14 @@ public class ObligSBinTre<T> implements Beholder<T> {
         {
             Node<T> b = p.venstre != null ? p.venstre : p.høyre;  // b for barn
             if (p == rot) rot = b;
-            else if (p == q.venstre){
+            else if (p == q.venstre) {
                 q.venstre = b;
-                if(b!=null){
-                    b.forelder=q;
+                if (b != null) {
+                    b.forelder = q;
                 }
-            }
-            else {
+            } else {
                 q.høyre = b;
-                if(b!= null) {
+                if (b != null) {
                     b.forelder = q;
                 }
             }
@@ -143,7 +142,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
                 if (r.høyre != null) {
                     r.forelder.høyre = s;
                 } else {
-                  //  s.høyre = r.høyre;
+                    //  s.høyre = r.høyre;
                     if (r.høyre != null) {
                         r.forelder.høyre = s;
 
@@ -155,135 +154,121 @@ public class ObligSBinTre<T> implements Beholder<T> {
         antall--;
         endringer++; //Lagt til endringer da fjerning også er en endring
         return true;
-}
+    }
 
 
-  public int fjernAlle(T verdi)
-  {
-    if (verdi == null) throw new
-      IllegalArgumentException("verdi er null!");
+    public int fjernAlle(T verdi) {
+        if (verdi == null) throw new
+                IllegalArgumentException("verdi er null!");
 
-    Node<T> p = rot;   // hjelpepeker
-    Node<T> q = null;  // forelder til p
-    Node<T> r = null;  // neste i inorden mhp. verdi
-    Node<T> s = null;  // forelder til r
+        Node<T> p = rot;   // hjelpepeker
+        Node<T> q = null;  // forelder til p
+        Node<T> r = null;  // neste i inorden mhp. verdi
+        Node<T> s = null;  // forelder til r
 
-    Stakk<Node<T>> stakk = new TabellStakk<>();
+        Stakk<Node<T>> stakk = new TabellStakk<>();
 
-    while (p != null)     // leter etter verdi
-    {
-      int cmp = comp.compare(verdi,p.verdi);  // sammenligner
-
-      if (cmp < 0) // skal til venstre
-      {
-        s = r;
-        r = q = p;
-        p = p.venstre;
-      }
-      else
-      {
-        if (cmp == 0)  // verdi ligger i p
+        while (p != null)     // leter etter verdi
         {
-          stakk.leggInn(q);  // legger inn forelder til p
-          stakk.leggInn(p);  // legger inn p
+            int cmp = comp.compare(verdi, p.verdi);  // sammenligner
+
+            if (cmp < 0) // skal til venstre
+            {
+                s = r;
+                r = q = p;
+                p = p.venstre;
+            } else {
+                if (cmp == 0)  // verdi ligger i p
+                {
+                    stakk.leggInn(q);  // legger inn forelder til p
+                    stakk.leggInn(p);  // legger inn p
+                }
+                // skal videre til høyre
+                q = p;
+                p = p.høyre;
+            }
         }
-        // skal videre til høyre
-        q = p;
-        p = p.høyre;
-      }
-    }
 
-    // det er lagt inn to noder for hvert treff
-    int verdiAntall = stakk.antall()/2;
+        // det er lagt inn to noder for hvert treff
+        int verdiAntall = stakk.antall() / 2;
 
-    if (verdiAntall == 0) return 0;
+        if (verdiAntall == 0) return 0;
 
-    while (stakk.antall() > 2)
-    {
-      p = stakk.taUt();  // p har ikke venstre barn
-      q = stakk.taUt();  // forelder til p
+        while (stakk.antall() > 2) {
+            p = stakk.taUt();  // p har ikke venstre barn
+            q = stakk.taUt();  // forelder til p
 
-      if (p == q.venstre) q.venstre = p.høyre;
-      else q.høyre = p.høyre;
-    }
+            if (p == q.venstre) q.venstre = p.høyre;
+            else q.høyre = p.høyre;
+        }
 
-    // Har nå fjernet alle duplikatene,
-    // men har igjen første forekomst
+        // Har nå fjernet alle duplikatene,
+        // men har igjen første forekomst
 
-    p = stakk.taUt();  // p inneholder verdi
-    q = stakk.taUt();  // forelder til p
+        p = stakk.taUt();  // p inneholder verdi
+        q = stakk.taUt();  // forelder til p
 
-    // Tilfelle 1) og 2), dvs. p har ikke to barn
-    if (p.venstre == null || p.høyre == null)
-    {
-      Node<T> x = p.høyre == null ? p.venstre : p.høyre;
-      if (p == rot) rot = x;
-      else if (p == q.venstre) q.venstre = x;
-      else q.høyre = x;
-    }
-    else  // p har to barn
-    {
-      p.verdi = r.verdi;   // kopierer fra den neste i inorden
-      if (r == p.høyre) p.høyre = r.høyre;
-      else s.venstre = r.høyre;
-    }
-
-    antall -= verdiAntall;
-
-    return verdiAntall;
-  }
-
-  @Override
-  public int antall()
-  {
-    return antall;
-  }
-  
-  public int antall(T verdi){
-
-    Node<T> p = rot; //Begynner i rot
-      int counter=0;
-    while (p != null) //Så lenge p ikke er null
-    {
-      int cmp = comp.compare(verdi, p.verdi); // Legger inn Comparator
-
-      if (cmp < 0 ){// Går til venstre
-          p = p.venstre;
-      }
-      else if (cmp > 0){ //Går til høyre
-          p = p.høyre;
-      }
-     else if(cmp==0){ //Går enda til høyre, da like verdier ligger der
-       counter++;
-       p=p.høyre;
-      }
-    }
-    return counter;
-  }
-  
-  @Override
-  public boolean tom()
-  {
-    return antall == 0;
-  }
-  
-  @Override
-  public void nullstill()
-  {
-      if (!tom()) nullstill(rot);
-      rot = null;
-      antall = 0;
-  }
-
-    private void nullstill(Node<T> p)
-    {
-        if (p.venstre != null)
+        // Tilfelle 1) og 2), dvs. p har ikke to barn
+        if (p.venstre == null || p.høyre == null) {
+            Node<T> x = p.høyre == null ? p.venstre : p.høyre;
+            if (p == rot) rot = x;
+            else if (p == q.venstre) q.venstre = x;
+            else q.høyre = x;
+        } else  // p har to barn
         {
+            p.verdi = r.verdi;   // kopierer fra den neste i inorden
+            if (r == p.høyre) p.høyre = r.høyre;
+            else s.venstre = r.høyre;
+        }
+
+        antall -= verdiAntall;
+
+        return verdiAntall;
+    }
+
+    @Override
+    public int antall() {
+        return antall;
+    }
+
+    public int antall(T verdi) {
+
+        Node<T> p = rot; //Begynner i rot
+        int counter = 0;
+        while (p != null) //Så lenge p ikke er null
+        {
+            int cmp = comp.compare(verdi, p.verdi); // Legger inn Comparator
+
+            if (cmp < 0) {// Går til venstre
+                p = p.venstre;
+            } else if (cmp > 0) { //Går til høyre
+                p = p.høyre;
+            } else if (cmp == 0) { //Går enda til høyre, da like verdier ligger der
+                counter++;
+                p = p.høyre;
+            }
+        }
+        return counter;
+    }
+
+    @Override
+    public boolean tom() {
+        return antall == 0;
+    }
+
+    @Override
+    public void nullstill() {
+        if (!tom()) nullstill(rot);
+        rot = null;
+        antall = 0;
+    }
+
+    private void nullstill(Node<T> p) {
+        if (p.venstre != null) {
             nullstill(p.venstre);
             p.venstre = null;
         }
-        if (p.høyre != null)
-        {
+        if (p.høyre != null) {
             nullstill(p.høyre);
             p.høyre = null;
         }
@@ -291,75 +276,66 @@ public class ObligSBinTre<T> implements Beholder<T> {
         endringer++; // Oppdater endringer også her
     }
 
-  private static <T> Node<T> førsteInorden(Node<T> p)
-  {
-      if(p==null){
-          return p;
-      }
-    while (p.venstre != null) p = p.venstre;
-    return p;
-  }
-
-  private static <T> Node<T> nesteInorden(Node<T> p)
-  {
-      if(p==null){
-          return null;
-      }
-    if (p.høyre != null)  // p har høyre barn
-    {
-      return førsteInorden(p.høyre);
-    }
-    else  // må gå oppover i treet
-    {
-      while (p.forelder != null && p.forelder.høyre == p)
-      {
-        p = p.forelder;
-      }
-      return p.forelder;
-    }
-  }
-
-  private static <T> void toString(Node<T> p, StringBuilder s)
-  {
-    if (p.venstre != null)
-    {
-      toString(p.venstre, s);
-      s.append(',').append(' ');
+    private static <T> Node<T> førsteInorden(Node<T> p) {
+        if (p == null) {
+            return p;
+        }
+        while (p.venstre != null) p = p.venstre;
+        return p;
     }
 
-    s.append(p.verdi);
-
-    if (p.høyre != null)
-    {
-      s.append(',').append(' ');
-      toString(p.høyre, s);
+    private static <T> Node<T> nesteInorden(Node<T> p) {
+        if (p == null) {
+            return null;
+        }
+        if (p.høyre != null)  // p har høyre barn
+        {
+            return førsteInorden(p.høyre);
+        } else  // må gå oppover i treet
+        {
+            while (p.forelder != null && p.forelder.høyre == p) {
+                p = p.forelder;
+            }
+            return p.forelder;
+        }
     }
-  }
 
+    private static <T> void toString(Node<T> p, StringBuilder s) {
+        if (p.venstre != null) {
+            toString(p.venstre, s);
+            s.append(',').append(' ');
+        }
 
-
-  public String toString()
-  {
-      Node<T> p =førsteInorden(rot);
-      StringBuilder s = new StringBuilder();
-      if(p==null){
-          s.append("[]");
-          return s.toString();
-      }
-    s.append('[');
-    while(p!=null){
         s.append(p.verdi);
-        p=nesteInorden(p);
-        s.append(", ");
+
+        if (p.høyre != null) {
+            s.append(',').append(' ');
+            toString(p.høyre, s);
+        }
+    }
+
+
+    public String toString() {
+        Node<T> p = førsteInorden(rot);
+        StringBuilder s = new StringBuilder();
+        if (p == null) {
+            s.append("[]");
+            return s.toString();
+        }
+        s.append('[');
+        while (p != null) {
+            s.append(p.verdi);
+            p = nesteInorden(p);
+            s.append(", ");
         }
 
 
-    s.setLength(s.length()-2);// For å fjerne komma
-      s.append(']');
-    return s.toString();
-  }
-    public String omvendtString()
-    {
+        s.setLength(s.length() - 2);// For å fjerne komma
+        s.append(']');
+        return s.toString();
+    }
+
+    public String omvendtString() {
         if (tom()) return "[]";
         StringBuilder s = new StringBuilder();   // StringBuilder
         s.append('[');                           // starter med [
@@ -368,17 +344,12 @@ public class ObligSBinTre<T> implements Beholder<T> {
         while (p.høyre != null) p = p.høyre;
         s.append(p.verdi);
 
-        while (true)
-        {
-            if (p.venstre != null)
-            {
+        while (true) {
+            if (p.venstre != null) {
                 p = p.venstre;
                 while (p.høyre != null) p = p.høyre;
-            }
-            else
-            {
-                while (p.forelder != null && p.forelder.venstre == p)
-                {
+            } else {
+                while (p.forelder != null && p.forelder.venstre == p) {
                     p = p.forelder;
                 }
                 p = p.forelder;
@@ -392,71 +363,69 @@ public class ObligSBinTre<T> implements Beholder<T> {
     }
 
 
-  
-  public String høyreGren() {
+    public String høyreGren() {
         //Fikk ikke til å bruke vedlagte Kø og Lister, brukte derfor java sine egne
-      List<T> ut=new ArrayList<>();
-      Queue<Node> queue=new LinkedList<>();
-      if(rot==null){
-          return ut.toString(); //Returnerer null
-      }
-      queue.offer(rot);
-      while(queue.size()!=0){
-          int lengdeKø=queue.size();
-          for(int i=0;i<lengdeKø;i++){
-              Node denne=queue.poll();
-              if(i==0){ //Tar alltid kun den første verdien fra høyre ut av køen
-                  ut.add((T) denne.verdi);
-              }
-              if(denne.høyre!=null){
-                  queue.offer(denne.høyre);
-              }
-              if(denne.venstre!=null){
-                  queue.offer(denne.venstre);
-              }
-          }
-      }
-      return ut.toString();
-  }
+        List<T> ut = new ArrayList<>();
+        Queue<Node> queue = new LinkedList<>();
+        if (rot == null) {
+            return ut.toString(); //Returnerer null
+        }
+        queue.offer(rot);
+        while (queue.size() != 0) {
+            int lengdeKø = queue.size();
+            for (int i = 0; i < lengdeKø; i++) {
+                Node denne = queue.poll();
+                if (i == 0) { //Tar alltid kun den første verdien fra høyre ut av køen
+                    ut.add((T) denne.verdi);
+                }
+                if (denne.høyre != null) {
+                    queue.offer(denne.høyre);
+                }
+                if (denne.venstre != null) {
+                    queue.offer(denne.venstre);
+                }
+            }
+        }
+        return ut.toString();
+    }
 
-public String lengstGren() {
+    public String lengstGren() {
         //Problemer med vedlagt stakk, brukte derfor Java sin
-    Stack<Node> stakk=new Stack<Node>();
-    Node<T> p=rot;
-    StringBuilder s=new StringBuilder();
-    if(p==null){
-        s.append("[]");
-        return s.toString();
-    }
-    //Her begynner logikken der vi ved hjelp av en stack finner noden som er lengst ned
-    stakk.push(p);
-    while(!stakk.isEmpty()){//Legger til lengste verdi på veien
-        p=stakk.remove(0);
-    if(p.høyre!=null){
-        stakk.add(p.høyre);
-    }
-    if(p.venstre!=null){
-        stakk.add(p.venstre);
-    }
-    }
-    //p er noden som ligger lengst ned
-    s.append("[");
-    Stack<Node> stakkUt=new Stack<Node>();
-    stakkUt.add(p);
-    while(p.forelder!=null){
-        p=p.forelder; // Legger foreldrene inn til en stack ut
+        Stack<Node> stakk = new Stack<Node>();
+        Node<T> p = rot;
+        StringBuilder s = new StringBuilder();
+        if (p == null) {
+            s.append("[]");
+            return s.toString();
+        }
+        //Her begynner logikken der vi ved hjelp av en stack finner noden som er lengst ned
+        stakk.push(p);
+        while (!stakk.isEmpty()) {//Legger til lengste verdi på veien
+            p = stakk.remove(0);
+            if (p.høyre != null) {
+                stakk.add(p.høyre);
+            }
+            if (p.venstre != null) {
+                stakk.add(p.venstre);
+            }
+        }
+        //p er noden som ligger lengst ned
+        s.append("[");
+        Stack<Node> stakkUt = new Stack<Node>();
         stakkUt.add(p);
+        while (p.forelder != null) {
+            p = p.forelder; // Legger foreldrene inn til en stack ut
+            stakkUt.add(p);
+        }
+        s.append(stakkUt.pop());
+        while (!stakkUt.isEmpty()) {
+            s.append(", ").append(stakkUt.pop()); // Tar ut verdiene
+        }
+        s.append("]");
+        return s.toString(); // Ikke veldig effektiv kode, mulig man kan effektivisere de to stackene, men den fungerer
     }
-    s.append(stakkUt.pop());
-    while(!stakkUt.isEmpty()){
-        s.append(", ").append(stakkUt.pop()); // Tar ut verdiene
-    }
-    s.append("]");
-    return s.toString(); // Ikke veldig effektiv kode, mulig man kan effektivisere de to stackene, men den fungerer
-}
 
-    public String[] grener()
-    {
+    public String[] grener() {
         Liste<String> liste = new TabellListe<>();
         StringBuilder s = new StringBuilder("[");
         if (!tom()) grener(rot, liste, s);
@@ -471,8 +440,7 @@ public String lengstGren() {
         return grener;                          // returnerer tabellen
     }
 
-    private void grener(Node<T> p, Liste<String> liste, StringBuilder s)
-    {
+    private void grener(Node<T> p, Liste<String> liste, StringBuilder s) {
         T verdi = p.verdi;
         int k = verdi.toString().length(); // lengden på verdi
 
@@ -482,9 +450,7 @@ public String lengstGren() {
 
             // må fjerne det som ble lagt inn sist - dvs. k + 1 tegn
             s.delete(s.length() - k - 1, s.length());
-        }
-        else
-        {
+        } else {
             s.append(p.verdi).append(',').append(' ');  // legger inn k + 2 tegn
             if (p.venstre != null) grener(p.venstre, liste, s);
             if (p.høyre != null) grener(p.høyre, liste, s);
@@ -492,73 +458,103 @@ public String lengstGren() {
         }
     }
 
-    public String bladnodeverdier()
-  {
-      Node<T> p=rot;
-      StringBuilder s = new StringBuilder("[");
-      if(p==null){
-          s.append("]");
-          return s.toString();
-      }
-      if (!tom()){
-          bladnodeverdier(rot,s);
-      }
-      s.setLength(s.length()-2);
-      s.append("]");
-    return s.toString();
-  }
-  public String bladnodeverdier(Node<T> p,StringBuilder s){
-      if(p==null){
-          s.append("[]");
-          return s.toString();
-      }
-      if (p.venstre == null && p.høyre == null) {
-          s.append(p.verdi);
-          s.append(", ");
-      }
-      if(p.venstre!=null){
-          bladnodeverdier(p.venstre,s);
-      }
-      if(p.høyre!=null){
-          bladnodeverdier(p.høyre,s);
-      }
-      return s.toString();
-  }
+    public String bladnodeverdier() {
+        Node<T> p = rot;
+        StringBuilder s = new StringBuilder("[");
+        if (p == null) {
+            s.append("]");
+            return s.toString();
+        }
+        if (!tom()) {
+            bladnodeverdier(rot, s);
+        }
+        s.setLength(s.length() - 2);
+        s.append("]");
+        return s.toString();
+    }
+
+    public String bladnodeverdier(Node<T> p, StringBuilder s) {
+        if (p == null) {
+            s.append("[]");
+            return s.toString();
+        }
+        if (p.venstre == null && p.høyre == null) {
+            s.append(p.verdi);
+            s.append(", ");
+        }
+        if (p.venstre != null) {
+            bladnodeverdier(p.venstre, s);
+        }
+        if (p.høyre != null) {
+            bladnodeverdier(p.høyre, s);
+        }
+        return s.toString();
+    }
 
 
-  public String postString(){
-      StringBuilder ut=new StringBuilder();
-      Node<T> p=rot;
-      if(p==null){
-          ut.append("[]");
-          return ut.toString();
-      }
-      Stack<Node<T>> stakk=new Stack<>();
-      stakk.push(p);
-      Stack<T>utStack=new Stack<>();
-      while(!stakk.isEmpty()){
-           Node denne=stakk.pop();
-           utStack.push((T) denne.verdi);
-          if (denne.venstre != null) {
-              stakk.push(denne.venstre);
+    public String postString() {
+        StringBuilder ut = new StringBuilder();
+        Node<T> p = rot;
+        if (p == null) {
+            ut.append("[]");
+            return ut.toString();
+        }
+        Stack<Node<T>> stakk = new Stack<>();
+        stakk.push(p);
+        Stack<T> utStack = new Stack<>();
+        while (!stakk.isEmpty()) {
+            Node denne = stakk.pop();
+            utStack.push((T) denne.verdi);
+            if (denne.venstre != null) {
+                stakk.push(denne.venstre);
+            }
+
+            if (denne.høyre != null) {
+                stakk.push(denne.høyre);
+            }
+        }
+        ut.append("[");
+        while (!utStack.empty()) {
+            ut.append(utStack.pop());
+            ut.append(", ");
+        }
+
+        ut.setLength(ut.length() - 2);
+        ut.append("]");
+        return ut.toString();
+    }
+    /*Forsøk på rekursivløsing av nesteblad, fungerte ikke
+    private static <T> Node nesteBlad(Node <T>p){
+        if (p==null){
+            return null;
+        }
+        if(p.venstre==null && p.høyre==null){
+            return p;
+        }
+        nesteBlad(p.venstre);
+        nesteBlad(p.høyre);
+    }
+    */
+
+
+      //Lager en hjelpemetode til traversering i next(), omtrent lik som førsteInorden, renamer for ryddighet
+      private static <T> Node nesteBlad(Node<T> p) { //Samme metode som Inorden, men her brukes den for å finne neste blad
+          //Måtte bruke denne funksjonen igjen, da jeg hadde problemer med p implementere en stack og rekursiv metode
+          if (p == null) {
+              return null;
           }
+          if (p.høyre != null)  // p har høyre barn
+          {
+             return førsteInorden(p.høyre); //Henter så lengst til venstre barn
+          } else  // må gå oppover i treet
+          {
+              while (p.forelder != null && p.forelder.høyre == p) {
 
-          if (denne.høyre != null) {
-              stakk.push(denne.høyre);
+                  p = p.forelder;
+              }
+              return p.forelder;
           }
       }
-      ut.append("[");
-      while (!utStack.empty()) {
-          ut.append(utStack.pop());
-        ut.append(", ");
-      }
-
-      ut.setLength(ut.length()-2);
-      ut.append("]");
-    return ut.toString();
-      }
-
-  
   @Override
   public Iterator<T> iterator()
   {
@@ -609,11 +605,12 @@ public String lengstGren() {
           if(endringer!=iteratorendringer){
               throw new ConcurrentModificationException("Antallet endringer stemmer ikke ");
           }
-          q=p;// Setter q til p for å bruke forelder til traversering
+          q=p;// Setter q til forelder til p
           T tempVariabel = p.verdi;// Lager en tempvariabel som skal hjelpe oss med traversering
           removeOK=true; // Kan fjerne verdier
           while (hasNext()) {
-              p = nesteInorden(p); // Bruker neste Inorder for å traversere
+              p = nesteBlad(p); // Bruker neste Inorder for å traversere treet og finne
+                                    //neste verdi av p
               if (p == null) {
                   return tempVariabel;
               }
@@ -621,14 +618,13 @@ public String lengstGren() {
                   return tempVariabel;
               }
           }
-
           return tempVariabel;
       }
           @Override
           public void remove ()
           {
               if(!removeOK){
-                  throw new IllegalStateException("Remove flagg er ikke satt");
+                  throw new IllegalStateException("Remove flagg er ikke satt, slett er ikke lov ");
               }
               removeOK=false; // Setter flagget og venter på ny tillatelse fra iteratoren
               if (q.forelder == null) { //
@@ -653,13 +649,22 @@ public String lengstGren() {
   public static void main(String[] args) {
 
       ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
-      tre.leggInn(1);
+      /*tre.leggInn(4);
       tre.leggInn(2);
+      tre.leggInn(6);
+      tre.leggInn(1);
+      tre.leggInn(3);
+      tre.leggInn(7);
+      tre.leggInn(3);
+      */
+
       Iterator<Integer> i = tre.iterator();
-      i = tre.iterator();
-      Iterator<Integer> j = tre.iterator();
+      tre.leggInn(2);
+      tre.leggInn(1);
+      tre.leggInn(3);
       i.next();
       i.remove();
+      tre.nullstill();
 
   }
 }
