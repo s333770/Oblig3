@@ -525,16 +525,28 @@ public class ObligSBinTre<T> implements Beholder<T> {
     }
     /*Forsøk på rekursivløsing av nesteblad, fungerte ikke
     private static <T> Node nesteBlad(Node <T>p){
+        Node q;
         if (p==null){
             return null;
         }
         if(p.venstre==null && p.høyre==null){
-            return p;
+         q=p;
+         p=p.forelder;
+            return q;
         }
+        p=p.forelder;
+        if(p.venstre!=null){
         nesteBlad(p.venstre);
+        }
+        if(p.høyre!=null){
         nesteBlad(p.høyre);
+        }
+        return p.forelder;
+
     }
     */
+
+
 
 
       //Lager en hjelpemetode til traversering i next(), omtrent lik som førsteInorden, renamer for ryddighet
@@ -555,6 +567,8 @@ public class ObligSBinTre<T> implements Beholder<T> {
               return p.forelder;
           }
       }
+
+
   @Override
   public Iterator<T> iterator()
   {
@@ -606,7 +620,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
               throw new ConcurrentModificationException("Antallet endringer stemmer ikke ");
           }
           q=p;// Setter q til forelder til p
-          T tempVariabel = p.verdi;// Lager en tempvariabel som skal hjelpe oss med traversering
+          T tempVariabel = p.verdi;// Lager en tempvariabel som skal hjelpe oss med riktige verdier under traversering
           removeOK=true; // Kan fjerne verdier
           while (hasNext()) {
               p = nesteBlad(p); // Bruker neste Inorder for å traversere treet og finne
@@ -643,28 +657,7 @@ public class ObligSBinTre<T> implements Beholder<T> {
           }
 
       }
-
-
-
   public static void main(String[] args) {
-
-      ObligSBinTre<Integer> tre = new ObligSBinTre<>(Comparator. naturalOrder ());
-      /*tre.leggInn(4);
-      tre.leggInn(2);
-      tre.leggInn(6);
-      tre.leggInn(1);
-      tre.leggInn(3);
-      tre.leggInn(7);
-      tre.leggInn(3);
-      */
-
-      Iterator<Integer> i = tre.iterator();
-      tre.leggInn(2);
-      tre.leggInn(1);
-      tre.leggInn(3);
-      i.next();
-      i.remove();
-      tre.nullstill();
 
   }
 }
